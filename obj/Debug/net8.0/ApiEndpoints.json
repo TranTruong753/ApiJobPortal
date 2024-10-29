@@ -1,0 +1,12 @@
+[
+  {
+    "ContainingType": "Backend.Controllers.ApiControllers.HomeController",
+    "Method": "GetData",
+    "RelativePath": "api/Home",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
