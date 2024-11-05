@@ -1,5 +1,11 @@
 ﻿using Backend.Data;
+using Backend.Interfaces;
+using Backend.Models;
+using Backend.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +19,6 @@ builder.Services.AddControllers();
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
@@ -42,7 +47,6 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-// Đăng ký DbContext
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -51,15 +55,39 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
-
-// Đăng ký CORS và cho phép truy cập từ http://localhost:3000
-builder.Services.AddCors(options =>
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
-        policy => policy.WithOrigins("http://localhost:3000")
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 12;
+})
+.AddEntityFrameworkStores<ApplicationDBContext>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme =
+    options.DefaultChallengeScheme =
+    options.DefaultForbidScheme =
+    options.DefaultScheme =
+    options.DefaultSignInScheme =
+    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+        )
+    };
 });
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 var app = builder.Build();
 
@@ -73,22 +101,22 @@ else if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    // Chuyển hướng đến Swagger UI khi khởi động ở chế độ phát triển
-    app.MapGet("/", context =>
-    {
-        context.Response.Redirect("/swagger");
-        return Task.CompletedTask;
-    });
 }
 
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
+//app.UseCors(x => x
+//     .AllowAnyMethod()
+//     .AllowAnyHeader()
+//     .AllowCredentials()
+//      //.WithOrigins("https://localhost:44351))
+//      .SetIsOriginAllowed(origin => true));
 
-// Sử dụng CORS với cấu hình đã thêm
-app.UseCors("AllowSpecificOrigin");
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Route cho Admin (MVC với Views)
