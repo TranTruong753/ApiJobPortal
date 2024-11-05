@@ -27,6 +27,11 @@ namespace Backend.Data
                     Name = "User",
                     NormalizedName = "USER"
                 },
+                new IdentityRole
+                {
+                    Name = "Employer",
+                    NormalizedName = "EMPLOYER"
+                },
             };
             modelBuilder.Entity<IdentityRole>().HasData(roles);
             /* modelBuilder.Entity<Course>().HasData(
