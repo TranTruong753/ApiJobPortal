@@ -155,3 +155,5 @@ C:\Users\Admin\Documents\DoAnHK1Nam4\Web1\Backend\obj\Debug\net8.0\refint\Backen
 C:\Users\Admin\Documents\DoAnHK1Nam4\Web1\Backend\obj\Debug\net8.0\Backend.pdb
 C:\Users\Admin\Documents\DoAnHK1Nam4\Web1\Backend\obj\Debug\net8.0\Backend.genruntimeconfig.cache
 C:\Users\Admin\Documents\DoAnHK1Nam4\Web1\Backend\obj\Debug\net8.0\ref\Backend.dll
+C:\Users\Admin\Documents\DoAnHK1Nam4\Web1\Backend\obj\Debug\net8.0\Backend.sourcelink.json
+C:\Users\Admin\Documents\DoAnHK1Nam4\Web1\Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
